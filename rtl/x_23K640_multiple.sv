@@ -5,7 +5,7 @@ module x_23K640_multiple(
    input    logic          i_valid,
    output   logic          o_accept,
    input    logic          i_rd_n_wr,
-   input    logic [15:0]   i_addr,
+   input    logic [18:0]   i_addr,
    input    logic [7:0]    i_wdata,
    // Application side - Completions
    output   logic          o_ready,

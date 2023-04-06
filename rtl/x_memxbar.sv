@@ -5,7 +5,7 @@ module x_memxbar(
    input    logic          i_main_valid, 
    output   logic          o_main_accept, 
    input    logic          i_main_rd_n_wr,
-   input    logic [15:0]   i_main_addr,   
+   input    logic [18:0]   i_main_addr,   
    input    logic [7:0]    i_main_wdata,  
    output   logic          o_main_ready,  
    output   logic [7:0]    o_main_rdata, 
@@ -75,43 +75,82 @@ module x_memxbar(
    input    logic [7:0]    i_7_rdata
 );
 
+   logic [2:0] sel;
+
+   // Context select
+   assign sel = i_main_addr[2:0];
+
+   // Addr tree
+   assign o_0_addr  = i_main_addr[18:3];  
+   assign o_1_addr  = i_main_addr[18:3];  
+   assign o_2_addr  = i_main_addr[18:3];  
+   assign o_3_addr  = i_main_addr[18:3];  
+   assign o_4_addr  = i_main_addr[18:3];  
+   assign o_5_addr  = i_main_addr[18:3];  
+   assign o_6_addr  = i_main_addr[18:3];  
+   assign o_7_addr  = i_main_addr[18:3];  
+
+   // Wdata tree
+   assign o_0_wdata = i_main_wdata;  
+   assign o_1_wdata = i_main_wdata;  
+   assign o_2_wdata = i_main_wdata;  
+   assign o_3_wdata = i_main_wdata;  
+   assign o_4_wdata = i_main_wdata;  
+   assign o_5_wdata = i_main_wdata;  
+   assign o_6_wdata = i_main_wdata;  
+   assign o_7_wdata = i_main_wdata;  
+
+   // Valid select
+   assign o_0_valid = i_main_valid & (sel == 'd0);  
+   assign o_1_valid = i_main_valid & (sel == 'd1);  
+   assign o_2_valid = i_main_valid & (sel == 'd2);  
+   assign o_3_valid = i_main_valid & (sel == 'd3);  
+   assign o_4_valid = i_main_valid & (sel == 'd4);  
+   assign o_5_valid = i_main_valid & (sel == 'd5);  
+   assign o_6_valid = i_main_valid & (sel == 'd6);  
+   assign o_7_valid = i_main_valid & (sel == 'd7);  
+
+   // Read not write tree
+   assign o_0_rd_n_wr = i_main_rd_n_wr;  
+   assign o_1_rd_n_wr = i_main_rd_n_wr;  
+   assign o_2_rd_n_wr = i_main_rd_n_wr;  
+   assign o_3_rd_n_wr = i_main_rd_n_wr;  
+   assign o_4_rd_n_wr = i_main_rd_n_wr;  
+   assign o_5_rd_n_wr = i_main_rd_n_wr;  
+   assign o_6_rd_n_wr = i_main_rd_n_wr;  
+   assign o_7_rd_n_wr = i_main_rd_n_wr;  
+
    // Temp hook up 0 only 
-   assign o_0_valid     = i_main_valid; 
-   assign o_0_rd_n_wr   = i_main_rd_n_wr; 
-   assign o_0_addr      = i_main_addr;    
-   assign o_0_wdata     = i_main_wdata;
-   assign o_main_accept = i_0_accept;
-   assign o_main_ready  = i_0_ready;
-   assign o_main_rdata  = i_0_rdata;
+   assign o_main_accept = i_0_accept |
+                          i_1_accept |
+                          i_2_accept |
+                          i_3_accept |
+                          i_4_accept |
+                          i_5_accept |
+                          i_6_accept |
+                          i_7_accept ;
+   
+   assign o_main_ready  = i_0_ready |
+                          i_1_ready |
+                          i_2_ready |
+                          i_3_ready |
+                          i_4_ready |
+                          i_5_ready |
+                          i_6_ready |
+                          i_7_ready ;
   
-   // Tie off 1 to 7
-   assign o_1_valid     = 'd0; 
-   assign o_1_rd_n_wr   = 'd0; 
-   assign o_1_addr      = 'd0;    
-   assign o_1_wdata     = 'd0;  
-   assign o_2_valid     = 'd0;  
-   assign o_2_rd_n_wr   = 'd0; 
-   assign o_2_addr      = 'd0;    
-   assign o_2_wdata     = 'd0; 
-   assign o_3_valid     = 'd0;  
-   assign o_3_rd_n_wr   = 'd0; 
-   assign o_3_addr      = 'd0;    
-   assign o_3_wdata     = 'd0; 
-   assign o_4_valid     = 'd0;  
-   assign o_4_rd_n_wr   = 'd0; 
-   assign o_4_addr      = 'd0;    
-   assign o_4_wdata     = 'd0; 
-   assign o_5_valid     = 'd0;  
-   assign o_5_rd_n_wr   = 'd0; 
-   assign o_5_addr      = 'd0;    
-   assign o_5_wdata     = 'd0; 
-   assign o_6_valid     = 'd0;  
-   assign o_6_rd_n_wr   = 'd0; 
-   assign o_6_addr      = 'd0;    
-   assign o_6_wdata     = 'd0; 
-   assign o_7_valid     = 'd0;  
-   assign o_7_rd_n_wr   = 'd0; 
-   assign o_7_addr      = 'd0;    
-   assign o_7_wdata     = 'd0;
+   always_comb begin
+      o_main_rdata = i_7_rdata;
+      priority case(1'b1)
+         i_6_ready:  o_main_rdata = i_6_rdata;
+         i_5_ready:  o_main_rdata = i_5_rdata;
+         i_4_ready:  o_main_rdata = i_4_rdata;
+         i_3_ready:  o_main_rdata = i_3_rdata;
+         i_2_ready:  o_main_rdata = i_2_rdata;
+         i_1_ready:  o_main_rdata = i_1_rdata;
+         i_0_ready:  o_main_rdata = i_0_rdata;
+         default:;
+      endcase
+   end 
 
 endmodule
